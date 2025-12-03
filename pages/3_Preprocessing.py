@@ -58,7 +58,7 @@ with tab_create:
 
     # Numeric Interactions
     with c2:
-        st.markdown("#### ✖️ Interaction")
+        st.markdown("#### ➗ Interaction")
         num_cols = df.select_dtypes(include=['number']).columns.tolist()
         
         if len(num_cols) < 2:
@@ -95,8 +95,9 @@ with tab_encode:
             if st.button("Apply OHE", key="btn_ohe"):
                 try:
                     # We ignore the fitted encoder for this UI preview step, as we are transforming the whole dataset
-                    new_df, _ = prep.one_hot_encode(df, cols_ohe, drop_first)
+                    new_df, encoder = prep.one_hot_encode(df, cols_ohe, drop_first)
                     st.session_state.df_full = new_df
+                    st.session_state.ohe_encoder = encoder
                     reset_pipeline_state()
                     st.success(f"One-Hot Encoding Applied to {len(cols_ohe)} columns!")
                     st.rerun()
@@ -109,8 +110,9 @@ with tab_encode:
             
             if st.button("Apply Ordinal", key="btn_le"):
                 try:
-                    new_df, _ = prep.label_encode(df, cols_le)
+                    new_df, encoder = prep.label_encode(df, cols_le)
                     st.session_state.df_full = new_df
+                    st.session_state.le_encoder = encoder
                     reset_pipeline_state()
                     st.success(f"Ordinal Encoding Applied to {len(cols_le)} columns!")
                     st.rerun()
@@ -134,7 +136,7 @@ with tab_split:
         test_size = st.slider("Test Size:", 0.1, 0.5, 0.2, 0.05)
     with c_split_3:
         stratify = st.checkbox("Stratify Split?", value=False, help="Useful for classification problems.")
-        st.write("") # Spacer
+        st.write("") 
         if st.button("Perform Split", type="primary", use_container_width=True):
             try:
                 # Call Backend
@@ -243,3 +245,6 @@ else:
     st.info("Complete the **Split** and **Scaling** steps to enable download.")
     st.subheader("Current Full Data")
     st.dataframe(st.session_state.df_full.head(), use_container_width=True)
+
+
+    
